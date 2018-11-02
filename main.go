@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	sparta "github.com/mweagle/Sparta"
 	spartaREST "github.com/mweagle/Sparta/archetype/rest"
-	"github.com/mweagle/Sparta/archetype/services"
+	spartaAccessor "github.com/mweagle/Sparta/aws/accessor"
 	spartaCF "github.com/mweagle/Sparta/aws/cloudformation"
 	todoResources "github.com/mweagle/SpartaTodoBackend/service"
 	gocf "github.com/mweagle/go-cloudformation"
@@ -16,12 +16,12 @@ import (
 func restResources(s3BucketResourceName string) []spartaREST.Resource {
 	return []spartaREST.Resource{
 		&todoResources.TodoCollectionResource{
-			S3Accessor: services.S3Accessor{
+			S3Accessor: spartaAccessor.S3Accessor{
 				S3BucketResourceName: s3BucketResourceName,
 			},
 		},
 		&todoResources.TodoItemResource{
-			S3Accessor: services.S3Accessor{
+			S3Accessor: spartaAccessor.S3Accessor{
 				S3BucketResourceName: s3BucketResourceName,
 			},
 		},

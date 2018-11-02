@@ -8,7 +8,7 @@ import (
 
 	"github.com/mweagle/Sparta"
 	spartaREST "github.com/mweagle/Sparta/archetype/rest"
-	"github.com/mweagle/Sparta/archetype/services"
+	spartaAccessor "github.com/mweagle/Sparta/aws/accessor"
 	spartaAPIGateway "github.com/mweagle/Sparta/aws/apigateway"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +20,7 @@ import (
 
 // TodoCollectionResource is the /todo resource
 type TodoCollectionResource struct {
-	services.S3Accessor
+	spartaAccessor.S3Accessor
 }
 
 /*
@@ -65,7 +65,7 @@ func (svc *TodoCollectionResource) Post(ctx context.Context,
 	logger.WithField("Body", apigRequest.Body).
 		Debug("TodoCollectionResource.Post saving body")
 
-	saveErr := svc.S3Accessor.Save(ctx,
+	saveErr := svc.S3Accessor.Put(ctx,
 		apigRequest.Body.ID,
 		apigRequest.Body)
 	if saveErr != nil {

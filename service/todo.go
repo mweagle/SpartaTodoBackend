@@ -6,7 +6,7 @@ import (
 
 	"github.com/mweagle/Sparta"
 	spartaREST "github.com/mweagle/Sparta/archetype/rest"
-	"github.com/mweagle/Sparta/archetype/services"
+	spartaAccessor "github.com/mweagle/Sparta/aws/accessor"
 	spartaAPIGateway "github.com/mweagle/Sparta/aws/apigateway"
 	"github.com/sirupsen/logrus"
 )
@@ -18,7 +18,7 @@ import (
 
 // TodoItemResource is the /todo/{id} resource
 type TodoItemResource struct {
-	services.S3Accessor
+	spartaAccessor.S3Accessor
 }
 
 func (svc *TodoItemResource) isValidTodoID(apigRequest TodoRequest) bool {
@@ -84,7 +84,7 @@ func (svc *TodoItemResource) Patch(ctx context.Context,
 	}
 
 	// Save the item, put it back...
-	saveErr := svc.Save(ctx,
+	saveErr := svc.Put(ctx,
 		apigRequest.PathParams[todoIDParam],
 		apigRequest.Body)
 	if saveErr != nil {
@@ -122,6 +122,7 @@ func (svc *TodoItemResource) Delete(ctx context.Context,
 
 // ResourceDefinition returns the Sparta REST definition for the Todo item
 func (svc *TodoItemResource) ResourceDefinition() (spartaREST.ResourceDefinition, error) {
+
 	return spartaREST.ResourceDefinition{
 		URL: todoItemURL,
 		MethodHandlers: spartaREST.MethodHandlerMap{
