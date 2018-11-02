@@ -8,6 +8,7 @@ import (
 	spartaREST "github.com/mweagle/Sparta/archetype/rest"
 	spartaAccessor "github.com/mweagle/Sparta/aws/accessor"
 	spartaCF "github.com/mweagle/Sparta/aws/cloudformation"
+	spartaDecorator "github.com/mweagle/Sparta/decorator"
 	todoResources "github.com/mweagle/SpartaTodoBackend/service"
 	gocf "github.com/mweagle/go-cloudformation"
 	"github.com/sirupsen/logrus"
@@ -58,7 +59,8 @@ func spartaTodoBackendFunctions(api *sparta.API,
 ================================================================================
 */
 
-func workflowHooks(s3BucketResourceName string) *sparta.WorkflowHooks {
+func workflowHooks(lambdaFuncs []*sparta.LambdaAWSInfo,
+	s3BucketResourceName string) *sparta.WorkflowHooks {
 	s3BucketHook := func(context map[string]interface{},
 		serviceName string,
 		cfTemplate *gocf.Template,
@@ -81,6 +83,7 @@ func workflowHooks(s3BucketResourceName string) *sparta.WorkflowHooks {
 	workflowHooks := &sparta.WorkflowHooks{
 		ServiceDecorators: []sparta.ServiceDecoratorHookHandler{
 			sparta.ServiceDecoratorHookFunc(s3BucketHook),
+			spartaDecorator.DashboardDecorator(lambdaFuncs, 60),
 		},
 	}
 	return workflowHooks
@@ -100,17 +103,18 @@ func main() {
 			"Access-Control-Allow-Origin":  "https://www.todobackend.com",
 		},
 	}
+	// Lambda functions
+	s3BucketResourceName := sparta.CloudFormationResourceName("S3Bucket", "S3Bucket")
+	lambdaFns := spartaTodoBackendFunctions(apiGateway, s3BucketResourceName)
 
 	// S3BucketResourceName
-	s3BucketResourceName := sparta.CloudFormationResourceName("S3Bucket",
-		"S3Bucket")
-	hooks := workflowHooks(s3BucketResourceName)
+	hooks := workflowHooks(lambdaFns, s3BucketResourceName)
 
 	// Deploy it
 	stackName := spartaCF.UserScopedStackName("SpartaTodoBackend")
 	sparta.MainEx(stackName,
 		fmt.Sprintf("Provision a serverless TodoBackend service (https://todobackend.com)"),
-		spartaTodoBackendFunctions(apiGateway, s3BucketResourceName),
+		lambdaFns,
 		apiGateway,
 		nil,
 		hooks,
