@@ -8,6 +8,7 @@ that satisfies the https://todobackend.com spec tests
 1. `git clone https://github.com/mweagle/SpartaTodoBackend`
 1. `cd SpartaTodoBackend`
 1. `go get -u -v ./...`
+1. `go get -u -d github.com/magefile/mage`
 1. `S3_BUCKET=<MY_S3_BUCKET_NAME> mage provision`
 1. In the _Stack output_ section of the log, look for the **API Gateway URL** key and copy it (eg: _https://XXXXXXXXXX.execute-api.us-west-2.amazonaws.com/v1_).
 1. Visit https://www.todobackend.com/specs/ and test your new API
