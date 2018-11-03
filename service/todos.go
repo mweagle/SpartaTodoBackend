@@ -38,8 +38,7 @@ func (svc *TodoCollectionResource) Get(ctx context.Context,
 	todos, todosErr := svc.S3Accessor.GetAll(ctx, ctor)
 	if todosErr != nil {
 		return nil,
-			spartaAPIGateway.NewErrorResponse(http.StatusInternalServerError,
-				todosErr.Error())
+			spartaAPIGateway.NewErrorResponse(http.StatusInternalServerError, todosErr)
 	}
 	return spartaAPIGateway.NewResponse(http.StatusOK, todos), nil
 }
@@ -70,7 +69,7 @@ func (svc *TodoCollectionResource) Post(ctx context.Context,
 		apigRequest.Body)
 	if saveErr != nil {
 		return nil,
-			spartaAPIGateway.NewErrorResponse(http.StatusInternalServerError)
+			spartaAPIGateway.NewErrorResponse(http.StatusInternalServerError, saveErr)
 	}
 
 	logger.WithField("Body", apigRequest.Body).
@@ -95,8 +94,7 @@ func (svc *TodoCollectionResource) Delete(ctx context.Context,
 	deleteAllErr := svc.S3Accessor.DeleteAll(ctx)
 	if deleteAllErr != nil {
 		return nil,
-			spartaAPIGateway.NewErrorResponse(http.StatusInternalServerError,
-				deleteAllErr.Error())
+			spartaAPIGateway.NewErrorResponse(http.StatusInternalServerError, deleteAllErr)
 	}
 	return spartaAPIGateway.NewResponse(http.StatusOK, []string{}), nil
 }

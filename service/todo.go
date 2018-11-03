@@ -41,8 +41,7 @@ func (svc *TodoItemResource) Get(ctx context.Context,
 		&todo)
 	if todoErr != nil {
 		return nil,
-			spartaAPIGateway.NewErrorResponse(http.StatusNotFound,
-				todoErr.Error())
+			spartaAPIGateway.NewErrorResponse(http.StatusNotFound, todoErr)
 	}
 	return spartaAPIGateway.NewResponse(http.StatusOK, todo), nil
 }
@@ -70,8 +69,7 @@ func (svc *TodoItemResource) Patch(ctx context.Context,
 		&existingTodo)
 	if existingTodoErr != nil {
 		return nil,
-			spartaAPIGateway.NewErrorResponse(http.StatusNotFound,
-				existingTodoErr.Error())
+			spartaAPIGateway.NewErrorResponse(http.StatusNotFound, existingTodoErr)
 	}
 	apigRequest.Body.URL = existingTodo.URL
 
@@ -89,8 +87,7 @@ func (svc *TodoItemResource) Patch(ctx context.Context,
 		apigRequest.Body)
 	if saveErr != nil {
 		return nil,
-			spartaAPIGateway.NewErrorResponse(http.StatusNotFound,
-				saveErr.Error())
+			spartaAPIGateway.NewErrorResponse(http.StatusNotFound, saveErr)
 	}
 
 	logger.WithField("Body", apigRequest.Body).
@@ -128,6 +125,9 @@ func (svc *TodoItemResource) ResourceDefinition() (spartaREST.ResourceDefinition
 		MethodHandlers: spartaREST.MethodHandlerMap{
 			// GET
 			http.MethodGet: spartaREST.NewMethodHandler(svc.Get, http.StatusOK).
+				Options(&sparta.LambdaFunctionOptions{
+					Timeout: 10,
+				}).
 				StatusCodes(http.StatusInternalServerError).
 				Privileges(svc.S3Accessor.KeysPrivilege("s3:GetObject"),
 					svc.S3Accessor.BucketPrivilege("s3:ListBucket")),
