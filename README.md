@@ -12,6 +12,7 @@ that satisfies the https://todobackend.com spec tests
 1. `S3_BUCKET=<MY_S3_BUCKET_NAME> mage provision`
 1. In the _Stack output_ section of the log, look for the **API Gateway URL** key and copy it (eg: _https://XXXXXXXXXX.execute-api.us-west-2.amazonaws.com/v1_).
 1. Visit https://www.todobackend.com/specs/ and test your new API
+  - Make sure to include the _/v1/todos_ path to your new API
 
 ## Result
 
