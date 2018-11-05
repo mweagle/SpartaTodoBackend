@@ -35,17 +35,17 @@ func spartaTodoBackendFunctions(api *sparta.API,
 
 	for _, eachResource := range restResources(s3BucketResourceName) {
 		// Register the resources and lambda functions
-		resourceMap, resourcesErr := spartaREST.RegisterResource(api, eachResource)
-		if resourcesErr != nil {
-			panic("Failed to initialize resourceMap: " + resourcesErr.Error())
+		registeredFuncs, registeredFuncsErr := spartaREST.RegisterResource(api, eachResource)
+		if registeredFuncsErr != nil {
+			panic("Failed to initialize resource: " + registeredFuncsErr.Error())
 		}
-		for _, eachFunc := range resourceMap {
-			eachFunc.DependsOn = []string{s3BucketResourceName}
-			// Tell each lambda function about the RestAPI
-			eachFunc.Options.Environment = map[string]*gocf.StringExpr{
-				"REST_API": api.RestAPIURL(),
-			}
-			lambdaFns = append(lambdaFns, eachFunc)
+		lambdaFns = append(lambdaFns, registeredFuncs...)
+	}
+	// Tell each lambda function about the RestAPI
+	for _, eachFunc := range lambdaFns {
+		eachFunc.DependsOn = []string{s3BucketResourceName}
+		eachFunc.Options.Environment = map[string]*gocf.StringExpr{
+			"REST_API": api.RestAPIURL(),
 		}
 	}
 	return lambdaFns
