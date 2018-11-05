@@ -126,7 +126,8 @@ func (svc *TodoItemResource) ResourceDefinition() (spartaREST.ResourceDefinition
 			// GET
 			http.MethodGet: spartaREST.NewMethodHandler(svc.Get, http.StatusOK).
 				Options(&sparta.LambdaFunctionOptions{
-					Timeout: 10,
+					MemorySize: 128,
+					Timeout:    10,
 				}).
 				StatusCodes(http.StatusInternalServerError).
 				Privileges(svc.S3Accessor.KeysPrivilege("s3:GetObject"),
